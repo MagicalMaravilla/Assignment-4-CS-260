@@ -1,0 +1,63 @@
+#include <iostream>
+#include <queue>
+#include <string>
+#include <vector>
+
+// Define the Order structure
+struct Order {
+    // Using vector as a dynamic array to store a list of order items.
+    // Vectors are ideal for this because they can dynamically resize,
+    // allowing us to add as many items as needed for each order.
+    std::vector<std::string> items;
+    std::string notes; // Special preparation notes
+
+    // Constructor initializes the vector and notes from the given arguments.
+    Order(const std::vector<std::string>& items, const std::string& notes = "")
+        : items(items), notes(notes) {}
+};
+
+// Update the Customer structure to include Order
+struct Customer {
+    std::string name;
+    int partySize;
+    std::string arrivalTime; // Simplified as a string for this example
+    std::string specialRequests;
+    Order order; // Embedded Order structure, demonstrating composition.
+    std::string contactInfo;
+    std::string seatingPreference;
+    bool hasArrived;
+
+    // Constructor initializes all customer details, including the embedded order.
+    Customer(const std::string& n, int pSize, const std::string& aTime, const std::string& sRequests, const Order& o, const std::string& cInfo, const std::string& sPreference, bool arrived)
+        : name(n), partySize(pSize), arrivalTime(aTime), specialRequests(sRequests), order(o), contactInfo(cInfo), seatingPreference(sPreference), hasArrived(arrived) {}
+};
+
+// Main function to demonstrate usage
+int main() {
+    // Queue is used here as a linked list to manage the order in which customers
+    // will be served. It ensures that customers are served in the order they arrive.
+    std::queue<Customer> restaurantQueue;
+
+    // Create some orders
+    Order order1({ "Pizza", "Soda" }, "No cheese");
+    Order order2({ "Burger", "Fries" }, "Extra ketchup");
+    Order order3({ "Salad" }, "Dressing on the side");
+
+    // Add customers with these orders to the queue
+    restaurantQueue.push(Customer("Jonny Jonnsworth", 2, "18:00", "Near window", order1, "555-1234", "Window", true));
+    restaurantQueue.push(Customer("Jenny Jennburg", 4, "18:15", "", order2, "555-5678", "Booth", true));
+    restaurantQueue.push(Customer("Bob Bobberson", 1, "18:30", "Vegetarian", order3, "555-9012", "Outdoor", true));
+
+    // Serve customers
+    while (!restaurantQueue.empty()) {
+        Customer& currentCustomer = restaurantQueue.front(); // Access the next customer to be served.
+        std::cout << currentCustomer.name << " with party size " << currentCustomer.partySize << " is being served. Order details: ";
+        for (const auto& item : currentCustomer.order.items) { // Iterate through the vector of items.
+            std::cout << item << " ";
+        }
+        std::cout << "(" << currentCustomer.order.notes << ")" << std::endl;
+        restaurantQueue.pop(); // Remove the customer from the queue after serving.
+    }
+
+    return 0;
+}
